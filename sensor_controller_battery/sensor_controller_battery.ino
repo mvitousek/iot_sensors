@@ -22,8 +22,7 @@ DallasTemperature DS18B20(&oneWire);
 
 #define SERVER "192.168.1.116"
 #define PORT 8712
-#define TIMEOUT_SECONDS 30
-#define RECONNECT_SECONDS 5
+#define TIMEOUT_SECONDS 10
 #define DELAY_TIME 500
 
 unsigned long start_time;
@@ -112,6 +111,7 @@ void send_temp() {
       return;
     } else {
       Serial.println("Failed to connect to server");
+      delay(500);
     }
   }
   fail();
