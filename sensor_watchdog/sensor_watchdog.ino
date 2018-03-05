@@ -11,7 +11,7 @@
 #define UP_TIMEOUT_TIME 30000ul
 #define SUCCESS_TIMEOUT_TIME 500 
 #define SUCCESS_DOWNTIME 900000ul
-#define FAIL_DOWNTIME 8000ul # Min time actually asleep is just over 8s
+#define FAIL_DOWNTIME 8000ul // Min time actually asleep is just over 8s
 
 
 
@@ -89,7 +89,7 @@ void fail() {
 
 // Based on https://github.com/JChristensen/millionOhms_SW/blob/master/millionOhms.cpp
 void sleep(unsigned long downtime) {
-     slept_time = 0;
+     slept_time = 0ul;
      do {
         ACSR |= _BV(ACD);                         //disable the analog comparator
         ADCSRA &= ~_BV(ADEN);                     //disable ADC
@@ -107,14 +107,19 @@ void sleep(unsigned long downtime) {
         sei();                         //ensure interrupts enabled so we can wake up again
         sleep_cpu();                   //go to sleep
                                        //----zzzz----zzzz----zzzz----zzzz
+        cli(); //wake up here, disable interrupts
         sleep_disable();
         wdtDisable();                  //don't need the watchdog while we're awake
-        slept_time += 8192;
-        if (slept_time >= downtime)) {
+        sei(); //enable interrupts again
+        slept_time += 8192ul;
+        if (slept_time >= downtime) {
             break;
         }
      } while (true);
 } 
+
+ISR(WDT_vect) {} //don't need to do anything here when the WDT wakes the MCU
+
 
 //enable the wdt for 8sec interrupt
 void wdtEnable(void)
